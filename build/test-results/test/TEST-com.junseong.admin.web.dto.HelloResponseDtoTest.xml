@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.junseong.admin.web.dto.HelloResponseDtoTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-07-13T13:29:05" hostname="DESKTOP-BRF48J0" time="0.071">
-  <properties/>
-  <testcase name="롬복_기능_테스트" classname="com.junseong.admin.web.dto.HelloResponseDtoTest" time="0.071"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
