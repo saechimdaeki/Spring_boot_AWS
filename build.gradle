@@ -10,21 +10,25 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-
-group 'junseong_silsup_jojoldu'
-version '1.0-SNAPSHOT'
+group 'com.jojoldu.book'
+version '1.0.4-SNAPSHOT-'+new Date().format("yyyyMMddHHmmss")
 sourceCompatibility = 1.8
+
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 
 }
