@@ -302,3 +302,42 @@ Domain Model
         }
     }
     이후는 프로젝트 코드를보장
+---
+    @Getter
+    @MappedSuperclass
+    @EntityListeners(AuditingEntityListener.class)
+    public class BaseTimeEntity {
+        @CreatedDate
+        private LocalDateTime createdDate;
+        @LastModifiedDate
+        private LocalDateTime modifiedDate;
+    }
+### @MappedSuperclass
+- JPA Entity 클래스들이 BaseTimeEntity을 상속할 경우 필드들(createdDate, modifiedDate)도 칼럼으로 인식하도록함 
+### @EntityListeners(AuditingEntityListener.class)
+- BaseTimeEntity 클래스에 Auditing 기능을 포함시킨다.
+### @CreatedDate
+- Entity가 생성되어 저장될 때 시간이 자동저장됨.
+
+### 이후 JPA Auditing 테스트 코드 작성하기
+    //PostRepositoryTest 클래스에 테스트메소드를 하나 더추가
+    @Test
+    public void BaseTimeEntitiy_등록(){
+        LocalDateTime now=LocalDateTime.of(2020,7,15,0,0,0);
+        postsRepository.save(Posts.builder()
+        .title("title")
+        .content("content")
+        .author("author")
+        .build());
+
+        List<Posts> postsList=postsRepository.findAll();
+
+        Posts posts=postsList.get(0);
+
+        System.out.println(">>>>>>>> createDate="+posts.getCreatedDate()+", modifiedDate= " + posts.getModifiedDate());
+
+        assertThat(posts.getCreatedDate()).isAfter(now);
+        assertThat(posts.getModifiedDate()).isAfter(now);
+    }
+### 앞으로 추가될 엔티티들은 더이상 등록일/수정일로 고민할필요가없다. BaseTimeEntity만 상속받으면
+### 자동으로 해결되기때문이다.
