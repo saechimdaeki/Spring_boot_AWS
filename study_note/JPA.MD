@@ -318,7 +318,19 @@ Domain Model
 - BaseTimeEntity 클래스에 Auditing 기능을 포함시킨다.
 ### @CreatedDate
 - Entity가 생성되어 저장될 때 시간이 자동저장됨.
+### @LastModifiedDate
+- 조회한 Entity의 값을 변경할 때 시간이 자동저장됨.
 
+#### 이후 JPA Auditing애노테이션들이 모두 활성화 할 수 있도록 Application클래스에 활성화 애노테이션 추가.
+   ``` 
+@EnableJpaAuditing //JPA활성화
+@SpringBootApplication
+   public class Application {
+        public static void main(String[] args){
+            SpringApplication.run(Application.class,args);
+        }
+    }
+```
 ### 이후 JPA Auditing 테스트 코드 작성하기
     //PostRepositoryTest 클래스에 테스트메소드를 하나 더추가
     @Test
@@ -339,5 +351,34 @@ Domain Model
         assertThat(posts.getCreatedDate()).isAfter(now);
         assertThat(posts.getModifiedDate()).isAfter(now);
     }
+
+
 ### 앞으로 추가될 엔티티들은 더이상 등록일/수정일로 고민할필요가없다. BaseTimeEntity만 상속받으면
 ### 자동으로 해결되기때문이다.
+
+    @RequiredArgsConstructor
+    @Service
+    public class PostsService {
+        ...
+        @Transactional
+        public Long update(Long id, PostsUpdateRequestDto requestDto){
+            Posts posts=postsRepository.findById(id)
+                    .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다 id="+id ));
+            posts.update(requestDto.getTitle(),requestDto.getContent());
+            return id;
+        }
+        public PostsResponseDto findById(Long id){
+            Posts entity=postsRepository.findById(id)
+                    .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다 id="+id));
+            return new PostsResponseDto(entity);
+        }
+    }
+
+##### 여기서신기한것이 있다. update기능에서 데이터베이스에 `쿼리를 날리는부분이없다.` 이게 가능한 이유는 JPA의 영속성컨텍스트 때문이다.
+### `영속성 컨텍스트`란 엔티티를 영구 저장하는 환경이다.    
+##### JPA의 엔티티매니저가 활성화된 상태로(Spring Data JPA를 쓴다면 기본옵션) `트랜잭션 안에서 데이터베이스에서 데이터를 가져오면 ` 
+##### 이 데이터는 영속성 컨텍스트가 유지된 상태이다. 이상태에서 해당 데이터의 값을 변경하면 `트랜잭션이 끝나는 시점에 해당 테이블에 변경분을 반영`함.
+##### 즉 Entitiy객체의 값만 변경하면 별도로 `Update쿼리를 날릴필요가없다`. 이 개념을 `더티체킹`이라한다.
+
+
+
